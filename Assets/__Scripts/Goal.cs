@@ -11,8 +11,6 @@ public class Goal : MonoBehaviour {
         // When the trigger is hit by something
         // Check to see if it's a Projectile
 
-        print("HIT!");
-
         if ( other.gameObject.tag == "Projectile" ) {
 
 

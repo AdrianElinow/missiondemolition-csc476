@@ -32,6 +32,8 @@ public class MissionDemolition : MonoBehaviour {
 
     public Text                 uitButton; // The Text on UIButton_View
 
+    public Text                 uitHighscore;
+
     public Vector3              castlePos; // The place to put castles
 
     public GameObject[]         castles;   // An array of the castles
@@ -45,16 +47,13 @@ public class MissionDemolition : MonoBehaviour {
     public int                  levelMax;  // The number of levels
 
     public int                  shotsTaken;
+    public int                  highscore = 5;
 
     public GameObject          castle;    // The current castle
 
     public GameMode            mode = GameMode.idle;
 
     public string               showing = "Show Slingshot"; // FollowCam mode
-
-
-
-
 
 
     void Start() {
@@ -74,6 +73,14 @@ public class MissionDemolition : MonoBehaviour {
 
 
     void StartLevel() {
+
+        print(level);
+
+        if (PlayerPrefs.HasKey("HighScore_"+level)) {                               // b
+            highscore = PlayerPrefs.GetInt("HighScore_"+level);
+        }
+        // Assign the high score to HighScore
+        PlayerPrefs.SetInt("HighScore_"+level, highscore); 
 
         // Get rid of the old castle if one exists
 
@@ -139,6 +146,8 @@ public class MissionDemolition : MonoBehaviour {
 
         uitShots.text = "Shots Taken: "+shotsTaken;
 
+        uitHighscore.text = "High Score: "+highscore;
+
     }
 
 
@@ -158,6 +167,11 @@ public class MissionDemolition : MonoBehaviour {
 
             mode = GameMode.levelEnd;
 
+            if(shotsTaken < highscore ){
+                PlayerPrefs.SetInt("HighScore_"+level, shotsTaken);
+                uitHighscore.text = "High Score: "+shotsTaken;
+            }
+
             // Zoom out
 
             SwitchView("Show Both");
@@ -165,6 +179,13 @@ public class MissionDemolition : MonoBehaviour {
             // Start the next level in 2 seconds
 
             Invoke("NextLevel", 2f);
+
+            /*
+            Text gt = this.GetComponent<Text>();
+            gt.text = "High Score: "+score;
+            if (score > PlayerPrefs.GetInt("HighScore")) {                       // d
+            PlayerPrefs.SetInt("HighScore", score);
+            */
 
         }
 
