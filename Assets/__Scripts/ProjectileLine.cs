@@ -13,6 +13,9 @@ public class ProjectileLine : MonoBehaviour {
     private GameObject         _poi;
     private List<Vector3>      points;
 
+    private List<Vector3>[] lines;
+    private int lineIndex;
+
     void Awake() {
 
         S = this;// Set the singleton
@@ -21,8 +24,9 @@ public class ProjectileLine : MonoBehaviour {
         // Disable the LineRenderer until it's needed
         line.enabled = false;
         // Initialize the points List
-        points = new List<Vector3>();
 
+        lines = new List<Vector3>[3];
+        lineIndex = 0;
     }
 
     // This is a property (that is, a method masquerading as a field)
@@ -38,7 +42,7 @@ public class ProjectileLine : MonoBehaviour {
 
                 // When _poi is set to something new, it resets everything
                 line.enabled = false;
-                points = new List<Vector3>();
+                lines[lineIndex] = new List<Vector3>();
                 AddPoint();
 
             }
@@ -53,7 +57,11 @@ public class ProjectileLine : MonoBehaviour {
 
         _poi = null;
         line.enabled = false;
-        points = new List<Vector3>();
+        
+        if( lineIndex + 1 > 2 )
+            lineIndex = 0;
+
+        lines[lineIndex] = new List<Vector3>();
 
     }
 
@@ -64,31 +72,31 @@ public class ProjectileLine : MonoBehaviour {
 
         Vector3 pt = _poi.transform.position;
 
-        if ( points.Count > 0 && (pt - lastPoint).magnitude < minDist ) {
+        if ( lines[lineIndex].Count > 0 && (pt - lastPoint).magnitude < minDist ) {
 
             // If the point isn't far enough from the last point, it returns
             return;
         }
 
-        if ( points.Count == 0 ) { // If this is the launch point...
+        if ( lines[lineIndex].Count == 0 ) { // If this is the launch point...
 
             Vector3 launchPosDiff = pt -Slingshot.LAUNCH_POS; // To be defined
             // ...it adds an extra bit of line to aid aiming later
-            points.Add( pt + launchPosDiff );
-            points.Add(pt);
+            lines[lineIndex].Add( pt + launchPosDiff );
+            lines[lineIndex].Add(pt);
             line.positionCount = 2;
             // Sets the first two points
-            line.SetPosition(0, points[0] );
-            line.SetPosition(1, points[1] );
+            line.SetPosition(0, lines[lineIndex][0] );
+            line.SetPosition(1, lines[lineIndex][1] );
             // Enables the LineRenderer
             line.enabled = true;
 
         } else {
 
             // Normal behavior of adding a point
-            points.Add( pt );
-            line.positionCount = points.Count;
-            line.SetPosition( points.Count-1, lastPoint );
+            lines[lineIndex].Add( pt );
+            line.positionCount = lines[lineIndex].Count;
+            line.SetPosition( lines[lineIndex].Count-1, lastPoint );
             line.enabled = true;
 
         }
@@ -101,11 +109,11 @@ public class ProjectileLine : MonoBehaviour {
 
     public Vector3 lastPoint {
         get {
-            if (points == null ) {
+            if (lines[lineIndex] == null ) {
                 // If there are no points, returns Vector3.zero
                 return ( Vector3.zero );
             }
-            return ( points[points.Count-1] );
+            return ( lines[lineIndex][lines[lineIndex].Count-1] );
         }
 
     }

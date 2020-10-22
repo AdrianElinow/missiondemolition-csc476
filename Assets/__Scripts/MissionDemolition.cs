@@ -72,15 +72,7 @@ public class MissionDemolition : MonoBehaviour {
 
 
 
-    void StartLevel() {
-
-        print(level);
-
-        if (PlayerPrefs.HasKey("HighScore_"+level)) {                               // b
-            highscore = PlayerPrefs.GetInt("HighScore_"+level);
-        }
-        // Assign the high score to HighScore
-        PlayerPrefs.SetInt("HighScore_"+level, highscore); 
+    public void StartLevel() {
 
         // Get rid of the old castle if one exists
 
@@ -102,18 +94,6 @@ public class MissionDemolition : MonoBehaviour {
 
         }
 
-
-
-        // Instantiate the new castle
-
-        castle = Instantiate<GameObject>( castles[level] );
-
-        castle.transform.position = castlePos;
-
-        shotsTaken = 0;
-
-
-
         // Reset the camera
 
         SwitchView("Show Both");
@@ -121,16 +101,25 @@ public class MissionDemolition : MonoBehaviour {
         ProjectileLine.S.Clear();
 
 
+        // Instantiate the new castle
+
+        castle = Instantiate<GameObject>( castles[level] );
+        castle.transform.position = castlePos;
+        shotsTaken = 0;
+
+        if(PlayerPrefs.HasKey("HighScore_"+level)){
+            highscore = PlayerPrefs.GetInt("HighScore_"+level);
+        }else{
+            highscore = 10;
+            PlayerPrefs.SetInt("HighScore_"+level, highscore);
+        }
+
 
         // Reset the goal
 
         Goal.goalMet = false;
 
-
-
         UpdateGUI();
-
-
 
         mode = GameMode.playing;
 
@@ -164,28 +153,18 @@ public class MissionDemolition : MonoBehaviour {
         if ( (mode == GameMode.playing) && Goal.goalMet ) {
 
             // Change mode to stop checking for level end
-
             mode = GameMode.levelEnd;
 
             if(shotsTaken < highscore ){
                 PlayerPrefs.SetInt("HighScore_"+level, shotsTaken);
                 uitHighscore.text = "High Score: "+shotsTaken;
-            }
+            }//*/
 
             // Zoom out
-
             SwitchView("Show Both");
 
             // Start the next level in 2 seconds
-
             Invoke("NextLevel", 2f);
-
-            /*
-            Text gt = this.GetComponent<Text>();
-            gt.text = "High Score: "+score;
-            if (score > PlayerPrefs.GetInt("HighScore")) {                       // d
-            PlayerPrefs.SetInt("HighScore", score);
-            */
 
         }
 
@@ -202,12 +181,15 @@ public class MissionDemolition : MonoBehaviour {
             level = 0;
 
         }
+        if (PlayerPrefs.HasKey("HighScore_"+level)) {                               // b
+            highscore = PlayerPrefs.GetInt("HighScore_"+level);
+        }
+        // Assign the high score to HighScore
+        PlayerPrefs.SetInt("HighScore_"+level, highscore); //*/
 
         StartLevel();
 
     }
-
-
 
     public void SwitchView( string eView = "" ) {                                    // c
 
