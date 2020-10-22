@@ -9,6 +9,7 @@ public class Slingshot : MonoBehaviour
     [Header("Set in Inspector")]
     public GameObject prefabProjectile;
     public float velocityMult = 8f;
+    private LineRenderer band;
 
     [Header("Set Dynamically")]
     public GameObject launchPoint;
@@ -29,6 +30,9 @@ public class Slingshot : MonoBehaviour
         Transform launchPointTrans = transform.Find("LaunchPoint");
         launchPoint = launchPointTrans.gameObject;
         launchPoint.SetActive(false);
+
+        band = GetComponent<LineRenderer>();
+        band.enabled = true;
 
         launchPos = launchPointTrans.position;
     }
@@ -56,9 +60,16 @@ public class Slingshot : MonoBehaviour
         projectileRigidbody = projectile.GetComponent<Rigidbody>(); 
         projectileRigidbody.isKinematic = true;
 
+        print("Drawing Band");
+        band.SetPosition(1, projectile.transform.position);
+
     }
 
     void Update(){
+
+        if( projectile != null)
+            band.SetPosition(1, projectile.transform.position);
+        else band.SetPosition(1, launchPoint.transform.position);
 
         if(!aimingMode)return;
 
@@ -82,6 +93,10 @@ public class Slingshot : MonoBehaviour
         
         if ( Input.GetMouseButtonUp(0) ) {                                         // e
             // The mouse has been released
+
+            print("Band Released");
+
+
             aimingMode = false;
             projectileRigidbody.isKinematic = false;
             projectileRigidbody.velocity = -mouseDelta * velocityMult;
@@ -89,7 +104,6 @@ public class Slingshot : MonoBehaviour
             FollowCam.POI = projectile;
 
             projectile = null;
-            
             
             MissionDemolition.ShotFired();
             ProjectileLine.S.poi = projectile; 
